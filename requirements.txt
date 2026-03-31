@@ -1,4 +1,9 @@
 playwright
-google-generativeai
+google-genai
 python-dotenv
 spotipy
+fastapi
+uvicorn[standard]
+pydantic
+requests
+aiohttp

@@ -101,3 +101,6 @@ if __name__ == "__main__":
         iniciar_daemon()
     except KeyboardInterrupt:
         print("\n\n🛑 Programa detenido por el usuario. ¡Hasta la próxima!")
+    finally:
+        # Limpieza del historial al cerrar el programa
+        db_manager.limpiar_historial()

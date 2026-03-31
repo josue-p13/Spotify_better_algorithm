@@ -42,3 +42,12 @@ def guardar_en_historial(artista, cancion):
     ''', (artista, cancion))
     conn.commit()
     conn.close()
+
+def limpiar_historial():
+    """Elimina todos los registros del historial al cerrar el programa."""
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM historial')
+    conn.commit()
+    conn.close()
+    print("🧹 Historial limpiado correctamente.")
