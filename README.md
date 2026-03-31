@@ -1,5 +1,7 @@
 # 🎵 Spotify Better Algorithm
 
+![Portada](Imagenes_Readme/Portada.png)
+
 Un sistema inteligente de recomendaciones musicales que integra **Spotify** con **YouTube** usando **IA generativa** para descubrir nueva música automáticamente.
 
 ---
