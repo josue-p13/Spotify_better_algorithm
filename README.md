@@ -8,9 +8,10 @@ Un sistema inteligente de recomendaciones musicales que integra **Spotify** con 
 
 ## ✨ Características Principales
 
-### 🤖 **Doble Modo de Funcionamiento**
-- **Modo Manual**: El usuario limpia los títulos de YouTube manualmente
-- **Modo Automático**: IA (Gemini) limpia los títulos automáticamente
+### 🤖 **Triple Modo de Funcionamiento**
+- **✋ Modo Manual**: El usuario limpia los títulos de YouTube manualmente (sin IA)
+- **🤖 Modo IA Gemini**: IA de Google Gemini limpia títulos automáticamente (requiere API Key)
+- **💻 Modo IA Local**: IA local con Ollama limpia títulos sin límites (gratis y privado)
 
 ### 🎯 **Recomendaciones Inteligentes**  
 - **Scraping de YouTube** en tiempo real
@@ -118,24 +119,11 @@ Una vez configurado, tendrás acceso a controles completos:
 ![Controles Play](Imagenes_Readme/Imagen_play.png)
 ![Controles Pause](Imagenes_Readme/Imagen_pause.png)
 
-### 3. 🤖 Modo Automático con IA
+### 3. 🤖 Modos de IA
 
-El sistema puede limpiar títulos automáticamente usando Gemini AI:
+El sistema ofrece 3 modos diferentes para procesar títulos de YouTube:
 
-![Modo IA](Imagenes_Readme/Imagen_modo_IA.png)
-
-**Proceso automático:**
-1. ✅ **Detecta** canción actual en Spotify
-2. 🔍 **Busca** en YouTube videos similares  
-3. 🤖 **Limpia** título con IA (Gemini)
-4. ➕ **Agrega** automáticamente a cola
-
-![Agregado IA](Imagenes_Readme/Image_agregado_a_cola_IA.png)
-
-### 4. 📝 Modo Manual
-
-Para mayor control, puedes limpiar títulos manualmente:
-
+#### ✋ Modo Manual
 ![Modo Manual](Imagenes_Readme/Imagen_recomendacion_manual.png)
 
 **Proceso manual:**
@@ -146,6 +134,75 @@ Para mayor control, puedes limpiar títulos manualmente:
 
 ![Ejemplo Manual](Imagenes_Readme/Imagen_ejemplo_manual.png)
 ![Agregado Manual](Imagenes_Readme/Imagen_se_agrego_correctamente_manual.png)
+
+#### 🤖 Modo IA Gemini (Cloud)
+![Modo IA](Imagenes_Readme/Imagen_modo_IA.png)
+
+**Proceso automático con Gemini:**
+1. ✅ **Detecta** canción actual en Spotify
+2. 🔍 **Busca** en YouTube videos similares  
+3. 🤖 **Limpia** título con IA Gemini (API de Google)
+4. ➕ **Agrega** automáticamente a cola
+
+![Agregado IA](Imagenes_Readme/Image_agregado_a_cola_IA.png)
+
+**Requisitos:**
+- API Key de Google Gemini
+- Cuota de API disponible
+
+#### 💻 Modo IA Local (Ollama)
+
+![Modo IA Local](Imagenes_Readme/Imagen_con_IA_local.png)
+
+**Proceso automático con IA local:**
+1. ✅ **Detecta** canción actual en Spotify
+2. 🔍 **Busca** en YouTube videos similares  
+3. 🤖 **Limpia** título con modelo local (Ollama)
+4. ➕ **Agrega** automáticamente a cola
+
+**Ventajas:**
+- ✅ **Sin límites de cuota** - Procesa tantas canciones como quieras
+- ✅ **Gratis** - No pagas por API
+- ✅ **Privacidad** - Tus datos no salen de tu máquina
+- ✅ **Offline** - Funciona sin internet (después de descargar el modelo)
+
+**Instalación de Ollama:**
+```bash
+# Linux / macOS
+curl -fsSL https://ollama.com/install.sh | sh
+
+# Windows: Descargar desde https://ollama.com/download
+
+# Descargar modelo recomendado
+ollama pull qwen2.5
+```
+
+**Modelos recomendados:**
+- `qwen2.5:1.5b` - Rápido, para CPUs modestos (~1GB)
+- `qwen2.5` (7b) - Balance perfecto (~4GB) ⭐ **Recomendado**
+- `qwen2.5:14b` - Máxima precisión (~8GB)
+- `llama3.2` - Alternativa rápida
+
+**Uso en la app:**
+1. Asegúrate de que Ollama esté corriendo: `ollama serve`
+2. Selecciona "💻 IA Local" en el selector de modo
+3. Ingresa el nombre del modelo (por defecto: `qwen2.5`)
+4. ¡Listo! La IA local procesará los títulos
+
+### 4. 📝 Comparación de Modos
+
+| Característica | ✋ Manual | 🤖 IA Gemini | 💻 IA Local |
+|---------------|----------|--------------|-------------|
+| **Costo** | Gratis | Pago según uso | Gratis |
+| **Velocidad** | Lenta (humano) | Rápida | Media |
+| **Precisión** | Alta (humano) | Muy alta | Alta |
+| **Límites** | Sin límites | Cuota API | Sin límites |
+| **Internet** | Necesario | Necesario | Opcional* |
+| **Privacidad** | ✅ | ⚠️ (datos a Google) | ✅ |
+| **Setup** | Ninguno | API Key | Instalar Ollama |
+| **Recomendado para** | Usuarios sin prisa | Máxima calidad | Uso intensivo |
+
+*Después de descargar el modelo
 
 ### 5. 🔍 Sugerencias de YouTube
 

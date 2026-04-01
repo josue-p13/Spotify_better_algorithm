@@ -13,8 +13,9 @@ const isConfigured = ref(false)
 const spotifyCredentials = ref<SpotifyCredentials | null>(null)
 const geminiApiKey = ref('')
 
-const useApiKey = ref(false)
 const apiKey = ref('')
+const aiMode = ref<'manual' | 'gemini' | 'local'>('manual')
+const localModel = ref('qwen2.5')
 const currentRecommendation = ref<Recommendation | null>(null)
 const loadingRecommendation = ref(false)
 const currentVideoUrl = ref('')
@@ -25,6 +26,8 @@ const currentTrack = ref<Track | null>(null)
 onMounted(() => {
   const savedCreds = localStorage.getItem('spotify_credentials')
   const savedGemini = localStorage.getItem('gemini_api_key')
+  const savedMode = localStorage.getItem('ai_mode')
+  const savedLocalModel = localStorage.getItem('local_model')
   
   if (savedCreds) {
     spotifyCredentials.value = JSON.parse(savedCreds)
@@ -34,6 +37,14 @@ onMounted(() => {
   if (savedGemini) {
     geminiApiKey.value = savedGemini
     apiKey.value = savedGemini
+  }
+
+  if (savedMode) {
+    aiMode.value = savedMode as 'manual' | 'gemini' | 'local'
+  }
+
+  if (savedLocalModel) {
+    localModel.value = savedLocalModel
   }
 })
 
@@ -91,12 +102,14 @@ const getRecommendation = async (songName?: string) => {
     
     const recommendation = await recommendationsApi.getNext(
       song, 
-      useApiKey.value ? apiKey.value : undefined
+      aiMode.value,
+      aiMode.value === 'gemini' ? apiKey.value : undefined,
+      aiMode.value === 'local' ? localModel.value : undefined
     )
     currentRecommendation.value = recommendation
     currentVideoUrl.value = recommendation.video_url
     
-    if (useApiKey.value && recommendation.mode === 'auto' && autoMode.value && spotifyCredentials.value) {
+    if (aiMode.value !== 'manual' && recommendation.mode === 'auto' && autoMode.value && spotifyCredentials.value) {
       try {
         await spotifyApi.addToQueue(spotifyCredentials.value, recommendation.artista!, recommendation.cancion!)
         console.log('✅ Canción agregada automáticamente a Spotify')
@@ -121,8 +134,13 @@ const handleSuggestionSelect = async (suggestion: Suggestion) => {
   try {
     const title = await youtubeApi.getNextVideo(suggestion.url)
     
-    if (useApiKey.value && apiKey.value) {
-      const cleaned = await youtubeApi.cleanTitle(title.raw_title, apiKey.value)
+    if (aiMode.value !== 'manual') {
+      const cleaned = await youtubeApi.cleanTitle(
+        title.raw_title, 
+        aiMode.value,
+        aiMode.value === 'gemini' ? apiKey.value : undefined,
+        aiMode.value === 'local' ? localModel.value : undefined
+      )
       
       if (cleaned.mode === 'auto' && cleaned.artista && cleaned.cancion) {
         await spotifyApi.addToQueue(spotifyCredentials.value, cleaned.artista, cleaned.cancion)
@@ -173,8 +191,16 @@ const refreshCurrentTrack = async () => {
   }
 }
 
-watch([useApiKey, apiKey], () => {
+watch([aiMode, apiKey, localModel], () => {
   currentRecommendation.value = null
+  // Guardar preferencias
+  localStorage.setItem('ai_mode', aiMode.value)
+  if (apiKey.value) {
+    localStorage.setItem('gemini_api_key', apiKey.value)
+  }
+  if (localModel.value) {
+    localStorage.setItem('local_model', localModel.value)
+  }
 })
 </script>
 
@@ -213,8 +239,9 @@ watch([useApiKey, apiKey], () => {
 
         <section class="section">
           <ModeSelector 
-            v-model:use-api-key="useApiKey"
+            v-model:ai-mode="aiMode"
             v-model:api-key="apiKey"
+            v-model:local-model="localModel"
           />
         </section>
 

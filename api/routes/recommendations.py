@@ -8,7 +8,9 @@ router = APIRouter()
 
 class GetRecommendationRequest(BaseModel):
     current_song: str
+    ai_mode: str = 'manual'
     api_key: Optional[str] = None
+    local_model: Optional[str] = 'qwen2.5'
 
 class MarkAsProcessedRequest(BaseModel):
     artista: str
@@ -19,7 +21,9 @@ async def get_recommendation(request: GetRecommendationRequest):
     try:
         recommendation = await get_automatic_recommendation(
             request.current_song, 
-            request.api_key
+            request.ai_mode,
+            request.api_key,
+            request.local_model
         )
         
         if recommendation:

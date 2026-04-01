@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 from api.services.youtube_scraper import get_video_suggestions, get_next_video, get_video_title
 from api.services.title_cleaner import clean_title_with_ai
+from api.services.ollama_cleaner import clean_title_with_ollama
 
 router = APIRouter()
 
@@ -14,7 +15,9 @@ class GetNextVideoRequest(BaseModel):
 
 class CleanTitleRequest(BaseModel):
     raw_title: str
+    ai_mode: str = 'manual'
     api_key: Optional[str] = None
+    local_model: Optional[str] = 'qwen2.5'
 
 @router.post("/suggestions")
 async def get_suggestions(request: GetSuggestionsRequest):
@@ -53,7 +56,7 @@ async def get_next(request: GetNextVideoRequest):
 @router.post("/clean-title")
 async def clean_title(request: CleanTitleRequest):
     try:
-        if request.api_key:
+        if request.ai_mode == 'gemini' and request.api_key:
             result = await clean_title_with_ai(request.raw_title, request.api_key)
             
             if result:
@@ -64,7 +67,22 @@ async def clean_title(request: CleanTitleRequest):
                     "cancion": result.get('cancion')
                 }
             else:
-                raise HTTPException(status_code=500, detail="No se pudo limpiar el título con IA")
+                raise HTTPException(status_code=500, detail="No se pudo limpiar el título con IA Gemini")
+        
+        elif request.ai_mode == 'local':
+            model = request.local_model or 'qwen2.5'
+            result = await clean_title_with_ollama(request.raw_title, model)
+            
+            if result:
+                return {
+                    "success": True,
+                    "mode": "auto",
+                    "artista": result.get('artista'),
+                    "cancion": result.get('cancion')
+                }
+            else:
+                raise HTTPException(status_code=500, detail="No se pudo limpiar el título con IA Local (Ollama)")
+        
         else:
             return {
                 "success": True,

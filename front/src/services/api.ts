@@ -96,11 +96,11 @@ export const youtubeApi = {
     return response.json()
   },
 
-  async cleanTitle(raw_title: string, api_key?: string): Promise<CleanedTitle> {
+  async cleanTitle(raw_title: string, ai_mode: string, api_key?: string, local_model?: string): Promise<CleanedTitle> {
     const response = await fetch(`${API_URL}/youtube/clean-title`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ raw_title, api_key })
+      body: JSON.stringify({ raw_title, ai_mode, api_key, local_model })
     })
     if (!response.ok) throw new Error('Failed to clean title')
     return response.json()
@@ -108,11 +108,11 @@ export const youtubeApi = {
 }
 
 export const recommendationsApi = {
-  async getNext(current_song: string, api_key?: string): Promise<Recommendation> {
+  async getNext(current_song: string, ai_mode: string, api_key?: string, local_model?: string): Promise<Recommendation> {
     const response = await fetch(`${API_URL}/recommendations/get-next`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ current_song, api_key })
+      body: JSON.stringify({ current_song, ai_mode, api_key, local_model })
     })
     if (!response.ok) throw new Error('Failed to get recommendation')
     return response.json()

@@ -3,25 +3,34 @@
     <h3>⚙️ Modo de Operación</h3>
     <div class="modes">
       <button 
-        :class="['mode-btn', { active: !useApiKey }]"
-        @click="$emit('update:useApiKey', false)"
+        :class="['mode-btn', { active: aiMode === 'manual' }]"
+        @click="$emit('update:aiMode', 'manual')"
       >
         <span class="icon">✋</span>
         <span class="label">Manual</span>
-        <span class="desc">Sin API Key</span>
+        <span class="desc">Sin IA</span>
       </button>
       
       <button 
-        :class="['mode-btn', { active: useApiKey }]"
-        @click="$emit('update:useApiKey', true)"
+        :class="['mode-btn', { active: aiMode === 'gemini' }]"
+        @click="$emit('update:aiMode', 'gemini')"
       >
         <span class="icon">🤖</span>
-        <span class="label">Automático</span>
-        <span class="desc">Con API Key</span>
+        <span class="label">IA Gemini</span>
+        <span class="desc">API Cloud</span>
+      </button>
+
+      <button 
+        :class="['mode-btn', { active: aiMode === 'local' }]"
+        @click="$emit('update:aiMode', 'local')"
+      >
+        <span class="icon">💻</span>
+        <span class="label">IA Local</span>
+        <span class="desc">Ollama</span>
       </button>
     </div>
 
-    <div v-if="useApiKey" class="api-key-input">
+    <div v-if="aiMode === 'gemini'" class="api-key-input">
       <label for="apiKey">🔑 API Key de Gemini:</label>
       <input 
         id="apiKey"
@@ -31,18 +40,32 @@
         placeholder="Ingresa tu API Key de Gemini"
       />
     </div>
+
+    <div v-if="aiMode === 'local'" class="local-ai-input">
+      <label for="modelName">🧠 Modelo de Ollama:</label>
+      <input 
+        id="modelName"
+        type="text" 
+        :value="localModel"
+        @input="$emit('update:localModel', ($event.target as HTMLInputElement).value)"
+        placeholder="qwen2.5"
+      />
+      <small class="hint">Asegúrate de que Ollama esté ejecutándose en http://localhost:11434</small>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 defineProps<{
-  useApiKey: boolean
+  aiMode: 'manual' | 'gemini' | 'local'
   apiKey: string
+  localModel: string
 }>()
 
 defineEmits<{
-  'update:useApiKey': [value: boolean]
+  'update:aiMode': [value: 'manual' | 'gemini' | 'local']
   'update:apiKey': [value: string]
+  'update:localModel': [value: string]
 }>()
 </script>
 
@@ -64,9 +87,15 @@ defineEmits<{
 
 .modes {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 1rem;
   margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .modes {
+    grid-template-columns: 1fr;
+  }
 }
 
 .mode-btn {
@@ -117,6 +146,11 @@ defineEmits<{
   animation: fadeIn 0.3s ease;
 }
 
+.local-ai-input {
+  margin-top: 1rem;
+  animation: fadeIn 0.3s ease;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -128,7 +162,8 @@ defineEmits<{
   }
 }
 
-.api-key-input label {
+.api-key-input label,
+.local-ai-input label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 600;
@@ -136,7 +171,8 @@ defineEmits<{
   font-size: 0.9rem;
 }
 
-.api-key-input input {
+.api-key-input input,
+.local-ai-input input {
   width: 100%;
   padding: 0.8rem 1rem;
   background: var(--spotify-base);
@@ -147,14 +183,24 @@ defineEmits<{
   transition: all 0.3s ease;
 }
 
-.api-key-input input:focus {
+.api-key-input input:focus,
+.local-ai-input input:focus {
   outline: none;
   border-color: var(--spotify-text);
   background: var(--spotify-surface-hover);
 }
 
-.api-key-input input::placeholder {
+.api-key-input input::placeholder,
+.local-ai-input input::placeholder {
   color: var(--spotify-subtext);
+}
+
+.local-ai-input .hint {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--spotify-subtext);
+  font-style: italic;
 }
 
 </style>
